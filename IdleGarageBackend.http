@@ -1,0 +1,6 @@
+@IdleGarageBackend_HostAddress = http://localhost:5026
+
+GET {{IdleGarageBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

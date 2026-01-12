@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "Ap01IIDfO8wdszkX8pvAQfPiJB1KLKPfHCrbjGm0uEs=",
+  "Source": "IdleGarageBackend",
+  "BasePath": "_content/IdleGarageBackend",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
