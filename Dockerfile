@@ -1,23 +1,27 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
+﻿# -------- Build / publish --------
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["IdleGarageBackend/IdleGarageBackend.csproj", "IdleGarageBackend/"]
-RUN dotnet restore "IdleGarageBackend/IdleGarageBackend.csproj"
+
 COPY . .
-WORKDIR "/src/IdleGarageBackend"
-RUN dotnet build "./IdleGarageBackend.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet restore "IdleGarageBackend/IdleGarageBackend.csproj"
+RUN dotnet publish "IdleGarageBackend/IdleGarageBackend.csproj" -c Release -o /app/publish
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./IdleGarageBackend.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# -------- Migrator (EF Core migrations) --------
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS migrator
+WORKDIR /src
 
-FROM base AS final
+COPY . .
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+CMD ["sh", "-c", "dotnet ef database update --project IdleGarageBackend/IdleGarageBackend.csproj --startup-project IdleGarageBackend/IdleGarageBackend.csproj"]
+
+# -------- Runtime --------
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+COPY --from=build /app/publish .
+EXPOSE 5026
+ENV ASPNETCORE_URLS=http://+:5026
+
 ENTRYPOINT ["dotnet", "IdleGarageBackend.dll"]
