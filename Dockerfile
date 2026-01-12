@@ -17,7 +17,8 @@ RUN rm -rf /root/.nuget/packages /root/.dotnet/tools
 RUN dotnet tool install --global dotnet-ef --version 9.*
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
-CMD ["sh", "-c", "dotnet ef database update --project IdleGarageBackend.csproj --startup-project IdleGarageBackend.csproj"]
+CMD ["sh", "-c", "dotnet ef database update --project IdleGarageBackend.csproj --startup-project IdleGarageBackend.csproj --connection \"$ConnectionStrings__DefaultConnection\""]
+
 
 # -------- Runtime --------
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
