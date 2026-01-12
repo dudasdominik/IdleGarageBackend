@@ -11,7 +11,10 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS migrator
 WORKDIR /src
 
 COPY . .
-RUN dotnet tool install --global dotnet-ef
+
+# Pineljük EF toolt (net9-hez EF9)
+RUN rm -rf /root/.nuget/packages /root/.dotnet/tools
+RUN dotnet tool install --global dotnet-ef --version 9.*
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
 CMD ["sh", "-c", "dotnet ef database update --project IdleGarageBackend.csproj --startup-project IdleGarageBackend.csproj"]
